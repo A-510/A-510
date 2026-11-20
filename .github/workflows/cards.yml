@@ -1,0 +1,84 @@
+name: profile cards
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Draw the page
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_USER: ${{ github.repository_owner }}
+        run: |
+          pip install --quiet pillow
+          mkdir -p dist
+          python scripts/fetch.py dist/data.json
+          python scripts/talk.py assets/whale/idle.gif dist/talk.svg dist/data.json
+          python scripts/building.py assets/whale dist/nightshift dist/data.json
+          python scripts/card.py assets/whale/thumbs-up.gif dist/card.svg dist/data.json
+          rm -f dist/talk_prev.svg
+      - name: Pin ${{ github.repository_owner }}/claude-image-mcp
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=claude-image-mcp&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-claude-image-mcp.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pin ${{ github.repository_owner }}/claude-createvideo-mcp
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=claude-createvideo-mcp&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-claude-createvideo-mcp.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pin ${{ github.repository_owner }}/wxc
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=wxc&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-wxc.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pin ${{ github.repository_owner }}/aichat
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=aichat&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-aichat.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pin ${{ github.repository_owner }}/Image_download
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=Image_download&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-Image_download.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pin ${{ github.repository_owner }}/atrichat
+        uses: stats-organization/github-readme-stats-action@v2
+        with:
+          card: pin
+          options: username=${{ github.repository_owner }}&repo=atrichat&title_color=e0382c&text_color=8b90b8&icon_color=f0a04a&bg_color=00000000&hide_border=true
+          path: dist/pin-atrichat.svg
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Snake
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/snake.svg?color_snake=#e0382c&color_dots=#ebedf0,#f5c9a0,#f0a04a,#e0382c,#7a1a14
+            dist/snake-dark.svg?color_snake=#f0a04a&color_dots=#161b22,#4a1410,#8a2018,#e0382c,#f0a04a
+      - uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
